@@ -220,7 +220,10 @@ static int http_open_cnx_internal(URLContext *h, AVDictionary **options)
             if (err < 0)
                 return err;
         }
+    } else if (strcmp(proto, "http")) {
+        return AVERROR(EINVAL);
     }
+
     if (port < 0)
         port = 80;
 
