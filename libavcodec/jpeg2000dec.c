@@ -1801,7 +1801,7 @@ static int decode_cblk(Jpeg2000DecoderContext *s, Jpeg2000CodingStyle *codsty,
 
     while (passno--) {
         if (bpno < 0 || bpno > 29) {
-            av_log(s->avctx, AV_LOG_ERROR, "bpno became invalid\n");
+            av_log(s->avctx, AV_LOG_ERROR, "bpno (%d) became invalid\n", bpno);
             return AVERROR_INVALIDDATA;
         }
         switch(pass_t) {
