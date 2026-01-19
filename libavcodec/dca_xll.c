@@ -1082,6 +1082,7 @@ static int copy_to_pbr(DCAXllDecoder *s, uint8_t *data, int size, int delay)
         return AVERROR(ENOMEM);
 
     memcpy(s->pbr_buffer, data, size);
+    memset(s->pbr_buffer + size, 0, AV_INPUT_BUFFER_PADDING_SIZE);
     s->pbr_length = size;
     s->pbr_delay = delay;
     return 0;
@@ -1136,6 +1137,7 @@ static int parse_frame_pbr(DCAXllDecoder *s, uint8_t *data, int size, DCAExssAss
 
     memcpy(s->pbr_buffer + s->pbr_length, data, size);
     s->pbr_length += size;
+    memset(s->pbr_buffer + s->pbr_length, 0, AV_INPUT_BUFFER_PADDING_SIZE);
 
     // Respect decoding delay after synchronization error
     if (s->pbr_delay > 0 && --s->pbr_delay)
