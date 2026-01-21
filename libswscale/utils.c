@@ -427,7 +427,8 @@ static av_cold int initFilter(int16_t **outFilter, int32_t **filterPos,
         filterSize = FFMIN(filterSize, srcW - 2);
         filterSize = FFMAX(filterSize, 1);
 
-        if (!FF_ALLOC_TYPED_ARRAY(filter, dstW * filterSize))
+        filter = av_malloc_array(dstW, filterSize * sizeof(*filter));
+        if (!filter)
             goto nomem;
         xDstInSrc = ((dstPos*(int64_t)xInc)>>7) - ((srcPos*0x10000LL)>>7);
         for (i = 0; i < dstW; i++) {
@@ -526,7 +527,8 @@ static av_cold int initFilter(int16_t **outFilter, int32_t **filterPos,
     if (dstFilter)
         filter2Size += dstFilter->length - 1;
     av_assert0(filter2Size > 0);
-    if (!FF_ALLOCZ_TYPED_ARRAY(filter2, dstW * filter2Size))
+    filter2 = av_malloc_array(dstW, filter2Size * sizeof(*filter2));
+    if (!filter2)
         goto nomem;
     for (i = 0; i < dstW; i++) {
         int j, k;
@@ -685,7 +687,8 @@ static av_cold int initFilter(int16_t **outFilter, int32_t **filterPos,
 
     // Note the +1 is for the MMX scaler which reads over the end
     /* align at 16 for AltiVec (needed by hScale_altivec_real) */
-    if (!FF_ALLOCZ_TYPED_ARRAY(*outFilter, *outFilterSize * (dstW + 3)))
+    *outFilter = av_malloc_array(dstW + 3, *outFilterSize * sizeof(**outFilter));
+    if (!*outFilter)
         goto nomem;
 
     /* normalize & store in outFilter */
@@ -1742,8 +1745,9 @@ av_cold int sws_init_context(SwsContext *c, SwsFilter *srcFilter,
             goto fail;
 
 #if HAVE_ALTIVEC
-        if (!FF_ALLOC_TYPED_ARRAY(c->vYCoeffsBank, c->vLumFilterSize * c->dstH) ||
-            !FF_ALLOC_TYPED_ARRAY(c->vCCoeffsBank, c->vChrFilterSize * c->chrDstH))
+        c->vYCoeffsBank = av_malloc_array(c->dstH, c->vLumFilterSize * sizeof(*c->vYCoeffsBank));
+        c->vCCoeffsBank = av_malloc_array(c->chrDstH, c->vChrFilterSize * sizeof(*c->vCCoeffsBank));
+        if (c->vYCoeffsBank == NULL || c->vCCoeffsBank == NULL)
             goto nomem;
 
         for (i = 0; i < c->vLumFilterSize * c->dstH; i++) {
