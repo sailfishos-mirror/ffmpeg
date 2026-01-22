@@ -93,6 +93,7 @@ typedef struct {
 
 typedef struct OptionsContext {
     OptionGroup *g;
+    int depth;
 
     /* input/output options */
     int64_t start_time;
