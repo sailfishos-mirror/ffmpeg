@@ -3267,6 +3267,12 @@ static int opt_preset(void *optctx, const char *opt, const char *arg)
     FILE *f=NULL;
     char filename[1000], line[1000], tmp_line[1000];
     const char *codec_name = NULL;
+    int depth = o->depth;
+
+    if (depth > 2) {
+        av_log(NULL, AV_LOG_ERROR, "too deep recursion\n");
+        return AVERROR(EINVAL);
+    }
 
     tmp_line[0] = *opt;
     tmp_line[1] = 0;
@@ -3280,6 +3286,7 @@ static int opt_preset(void *optctx, const char *opt, const char *arg)
         exit_program(1);
     }
 
+    o->depth ++;
     while (fgets(line, sizeof(line), f)) {
         char *key = tmp_line, *value, *endptr;
 
@@ -3304,6 +3311,7 @@ static int opt_preset(void *optctx, const char *opt, const char *arg)
         }
     }
 
+    o->depth = depth;
     fclose(f);
 
     return 0;
