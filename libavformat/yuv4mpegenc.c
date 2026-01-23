@@ -195,6 +195,9 @@ static int yuv4_write_packet(AVFormatContext *s, AVPacket *pkt)
 
     width  = st->codecpar->width;
     height = st->codecpar->height;
+    if (frame->width != width || frame->height != height)
+        return AVERROR(EINVAL);
+
 
     ptr = frame->data[0];
 
